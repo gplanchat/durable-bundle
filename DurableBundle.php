@@ -29,9 +29,9 @@ final class DurableBundle extends Bundle
             },
         );
 
-        // Le quatrième, et il manquait. `WorkflowDefinitionLoader` lit déjà `#[AsWorkflow]` pour
-        // nommer le type ; c'est ici que la classe devient trouvable par le registre, sans balise
-        // écrite à la main dans le `services.yaml` de l'application.
+        // The fourth one, and it was missing. `WorkflowDefinitionLoader` already reads `#[AsWorkflow]`
+        // to name the type; this is where the class becomes findable by the registry, without a tag
+        // hand-written in the application's `services.yaml`.
         $container->registerAttributeForAutoconfiguration(
             AsWorkflow::class,
             static function (ChildDefinition $definition, AsWorkflow $_attribute, \Reflector $_reflector): void {
