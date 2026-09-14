@@ -8,20 +8,20 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Dit ce qu'il faut configurer quand le verrou de reprise n'a pas de fabrique.
+ * Says what to configure when the resume lock has no factory.
  *
- * Le backend DBAL n'a pas de serveur pour sérialiser les tâches d'une même exécution : c'est
- * `SingleResumeLockMiddleware` qui s'en charge, et sans lui deux workers rejouent le même journal
- * en même temps. Sa fabrique est prise dans le conteneur de l'application.
+ * The DBAL backend has no server to serialise the tasks of one execution: `SingleResumeLockMiddleware`
+ * does it, and without it two workers replay the same journal at the same time. Its factory is taken
+ * from the application's container.
  *
- * Sans `framework.lock`, ce service n'existe pas et la compilation échoue déjà — sur un « service
- * inexistant » qui nomme `lock.factory` et laisse chercher. Ce que l'exploitant doit savoir n'est
- * pas quel service manque, mais quelle section de configuration l'aurait posé, et pourquoi elle
- * n'est pas optionnelle ici.
+ * Without `framework.lock` that service does not exist and compilation already fails — on a
+ * "non-existent service" that names `lock.factory` and leaves the operator searching. What the
+ * operator needs to know is not which service is missing, but which configuration section would have
+ * provided it, and why it is not optional here.
  *
- * Vérifié dans une passe et non dans l'extension : au moment où les extensions se chargent, celle
- * qui pose `lock.factory` n'a pas forcément tourné, et un test d'existence y répondrait faux pour
- * une application correctement configurée.
+ * Checked in a pass rather than in the extension: when extensions load, the one that registers
+ * `lock.factory` has not necessarily run yet, and an existence check there would answer false for a
+ * correctly configured application.
  */
 final class RequireLockFactoryPass implements CompilerPassInterface
 {
@@ -33,8 +33,8 @@ final class RequireLockFactoryPass implements CompilerPassInterface
             return;
         }
 
-        // Le service peut avoir été redéfini sans argument par l'application ; on retombe alors sur
-        // le nom conventionnel plutôt que d'échouer sur la lecture de l'argument.
+        // The application may have redefined the service without arguments; fall back to the
+        // conventional name rather than failing on the argument read.
         $arguments = $container->getDefinition(self::LOCK_SERVICE)->getArguments();
         $factory = (string) ($arguments[0] ?? 'lock.factory');
 
@@ -43,11 +43,11 @@ final class RequireLockFactoryPass implements CompilerPassInterface
         }
 
         throw new \LogicException(\sprintf(
-            'durable: le backend DBAL sérialise les reprises d\'une même exécution avec un verrou, '
-            . 'et le service "%s" qui le fournit n\'existe pas. Activez le composant Lock — '
-            . '`framework.lock: true` dans config/packages/framework.yaml, ou une entrée `framework.lock.resources` '
-            . 'pointant un magasin partagé entre vos processus — ou nommez votre propre fabrique dans '
-            . '`durable.dbal.lock_factory`. Sans verrou, deux workers rejouent le même journal en même temps.',
+            'durable: the DBAL backend serialises the resumes of one execution with a lock, '
+            . 'and the service "%s" that provides it does not exist. Enable the Lock component — '
+            . '`framework.lock: true` in config/packages/framework.yaml, or a `framework.lock.resources` entry '
+            . 'pointing at a store shared between your processes — or name your own factory in '
+            . '`durable.dbal.lock_factory`. Without a lock, two workers replay the same journal at the same time.',
             $factory,
         ));
     }
