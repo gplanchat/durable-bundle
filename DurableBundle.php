@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Gplanchat\Durable\Bundle;
 
 use Gplanchat\Durable\Attribute\AsActivityHandler;
-use Gplanchat\Durable\Attribute\AsWorkflow;
 use Gplanchat\Durable\Attribute\AsNexusServiceHandler;
+use Gplanchat\Durable\Attribute\AsWorkflow;
 use Gplanchat\Durable\Attribute\FulfilsNexusOperation;
 use Gplanchat\Durable\Bundle\DependencyInjection\Compiler\ActivityHandlerPass;
 use Gplanchat\Durable\Bundle\DependencyInjection\Compiler\DurableTemporalTransportFactoryPass;
