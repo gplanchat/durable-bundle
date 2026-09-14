@@ -690,8 +690,8 @@ final class DurableExtension extends Extension
                     new Reference(WorkflowClientInterface::class),
                     new Reference(WorkflowMetadataStore::class),
                     new Reference(WorkflowDefinitionLoader::class),
-                    // Le profileur n'existe qu'en debug depuis ce correctif, et le constructeur
-                    // target declares the dependency `?DurableExecutionTrace $executionTrace = null`.
+                    // The profiler only exists in debug since this fix, and the target
+                    // constructor declares the dependency `?DurableExecutionTrace $executionTrace = null`.
                     // A bare reference would fail the production container's compilation as soon as
                     // a `temporal.dsn` is configured.
                     new Reference('durable.execution_trace', ContainerInterface::NULL_ON_INVALID_REFERENCE),
@@ -779,11 +779,11 @@ final class DurableExtension extends Extension
 
     /**
      * The profiler is not neutral plumbing: its observer is injected into
-     * `ExecutionRuntime`, `ExecutionEngine` et `ActivityMessageProcessor`, donc il passe sur le
+     * `ExecutionRuntime`, `ExecutionEngine` and `ActivityMessageProcessor`, so it sits on the
      * hot path of every execution, and its trace is emptied only by a `kernel.request` listener,
      * which `messenger:consume` never fires.
      *
-     * Hors debug, on n'en enregistre donc rien du tout et l'observation retombe sur un objet nul.
+     * Outside debug, none of it is registered at all and observation falls back to a null object.
      * FrameworkBundle does the same for its own collectors, loaded from separate files under a
      * condition.
      */
@@ -793,7 +793,7 @@ final class DurableExtension extends Extension
             ->setPublic(false)
         ;
 
-        self::aliaserObservateur($container, 'durable.execution_observer.null');
+        self::aliasObserver($container, 'durable.execution_observer.null');
     }
 
     /**
@@ -806,7 +806,7 @@ final class DurableExtension extends Extension
      * `MergeExtensionConfigurationPass` runs at compilation, after the configuration is loaded, so
      * an unconditional `setAlias()` erased that alias and the escape hatch did not work.
      */
-    private static function aliaserObservateur(ContainerBuilder $container, string $service): void
+    private static function aliasObserver(ContainerBuilder $container, string $service): void
     {
         if ($container->hasAlias(WorkflowExecutionObserverInterface::class)
             || $container->hasDefinition(WorkflowExecutionObserverInterface::class)
@@ -822,14 +822,14 @@ final class DurableExtension extends Extension
     private function registerProfiler(ContainerBuilder $container): void
     {
         $container->register('durable.execution_trace', DurableExecutionTrace::class)
-            // `ResetDurableProfilerListener` ne borne que le cas HTTP. Dans un worker il n'y a pas
-            // request, and it is `services_resetter`, so this tag, that empties the trace between
-            // deux messages. Sans lui, un `messenger:consume` accumule la timeline tant qu'il vit.
+            // `ResetDurableProfilerListener` only bounds the HTTP case. In a worker there is no
+            // request, and it is `services_resetter`, hence this tag, that empties the trace between
+            // two messages. Without it, a `messenger:consume` accumulates the timeline as long as it lives.
             ->addTag('kernel.reset', ['method' => 'reset'])
             ->setPublic(true)
         ;
 
-        self::aliaserObservateur($container, 'durable.execution_trace');
+        self::aliasObserver($container, 'durable.execution_trace');
 
         $container->register(ResetDurableProfilerListener::class)
             ->setArguments([new Reference('durable.execution_trace')])

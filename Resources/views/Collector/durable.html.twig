@@ -236,9 +236,9 @@
                             <tr>
                                 <th>Workflow ID</th>
                                 <th>Type</th>
-                                <th>Statut</th>
+                                <th>Status</th>
                                 <th>Input</th>
-                                <th>Trace processus (segments)</th>
+                                <th>Process trace (segments)</th>
                                 <th>Events</th>
                             </tr>
                         </thead>
@@ -315,11 +315,11 @@
                                             <dd><code>{{ ex.executionId }}</code></dd>
                                         </div>
                                         <div>
-                                            <dt>Type de workflow</dt>
+                                            <dt>Workflow type</dt>
                                             <dd>{{ _wf|default('—') }}</dd>
                                         </div>
                                         <div>
-                                            <dt>Statut</dt>
+                                            <dt>Status</dt>
                                             <dd>
                                                 <span class="durable-status-badge durable-status-badge--{{ ex.executionStatus|default('unknown') }}">{{ ex.executionStatusLabel|default('—') }}</span>
                                             </dd>
@@ -332,7 +332,7 @@
                                             </dd>
                                         </div>
                                         <div style="grid-column: 1 / -1;">
-                                            <dt>Input (payload initial)</dt>
+                                            <dt>Input (initial payload)</dt>
                                             <dd class="text-muted">{{ ex.payloadSummary|default('—') }}</dd>
                                         </div>
                                     </dl>
@@ -350,7 +350,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>ID</th>
-                                                    <th>Heure (journal)</th>
+                                                    <th>Time (journal)</th>
                                                     <th>Event type</th>
                                                     <th>Category</th>
                                                     <th>Summary</th>
@@ -382,8 +382,8 @@
                                         </p>
                                         <div class="durable-timeframe-wrap">
                                             <div class="durable-timeframe-legend">
-                                                <span><span class="durable-timeframe-swatch" style="background:#4a90d9"></span> Planification</span>
-                                                <span><span class="durable-timeframe-swatch" style="background:#9b59b6"></span> Cycle de vie workflow</span>
+                                                <span><span class="durable-timeframe-swatch" style="background:#4a90d9"></span> Scheduling</span>
+                                                <span><span class="durable-timeframe-swatch" style="background:#9b59b6"></span> Workflow lifecycle</span>
                                                 <span><span class="durable-timeframe-swatch" style="background:#27ae60"></span> Effects / completions</span>
                                             </div>
                                             <div class="durable-timeframe-axis">
@@ -403,7 +403,7 @@
                                         <div class="durable-timeframe-wrap">
                                             <div class="durable-timeframe-legend">
                                                 <span><span class="durable-timeframe-swatch" style="background:#4a90d9"></span> Messenger (WorkflowRunMessage)</span>
-                                                <span><span class="durable-timeframe-swatch" style="background:#9b59b6"></span> Run workflow (moteur)</span>
+                                                <span><span class="durable-timeframe-swatch" style="background:#9b59b6"></span> Workflow run (engine)</span>
                                                 <span><span class="durable-timeframe-swatch" style="background:#27ae60"></span> Activity</span>
                                             </div>
                                             <div class="durable-timeframe-axis">
@@ -461,10 +461,10 @@
         </div>
 
         <div class="tab">
-            <h3 class="tab-title">Vue globale</h3>
+            <h3 class="tab-title">Overview</h3>
             <div class="tab-content">
                 {% if processTf.bounds is not null and processTf.segments is not empty %}
-                    <h4>Time frame — tous processus confondus</h4>
+                    <h4>Time frame — all processes together</h4>
                     <div class="durable-timeframe-wrap">
                         <div class="durable-timeframe-axis">
                             <span>0&nbsp;ms</span>

@@ -117,9 +117,9 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
         // The barrier, at the one place `$this->data` is built. It applies **key by key**: a
         // pathological payload makes its own panel disappear, not the whole collector, which is
         // what the blanket barrier did not guarantee, `$this->data` being typed
-        // `array|Data` chez le parent.
-        foreach ($this->data as $cle => $valeur) {
-            $this->data[$cle] = RecordedDetails::storable($valeur);
+        // `array|Data` on the parent.
+        foreach ($this->data as $key => $value) {
+            $this->data[$key] = RecordedDetails::storable($value);
         }
     }
 
