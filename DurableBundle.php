@@ -13,6 +13,7 @@ use Gplanchat\Durable\Bundle\DependencyInjection\Compiler\DurableTemporalTranspo
 use Gplanchat\Durable\Bundle\DependencyInjection\Compiler\NexusHandlerPass;
 use Gplanchat\Durable\Bundle\DependencyInjection\Compiler\RegisterDurableMiddlewarePass;
 use Gplanchat\Durable\Bundle\DependencyInjection\Compiler\RequireLockFactoryPass;
+use Gplanchat\Durable\Bundle\DependencyInjection\Compiler\TemporalReceiversPass;
 use Gplanchat\Durable\Bundle\DependencyInjection\Compiler\WorkflowPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -68,6 +69,8 @@ final class DurableBundle extends Bundle
         $container->addCompilerPass(new ActivityHandlerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 50);
         // Same priority, same reason: after autoconfiguration by attribute, before the passes at 0.
         $container->addCompilerPass(new NexusHandlerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 50);
+        // After NexusHandlerPass, which decides whether durable_nexus exists.
+        $container->addCompilerPass(new TemporalReceiversPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 40);
         // After the DBAL services are registered, before the container complains about a missing
         // service: the pass's message says what to configure, not only what is missing.
         $container->addCompilerPass(new RequireLockFactoryPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 20);
