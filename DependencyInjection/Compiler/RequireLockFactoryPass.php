@@ -133,6 +133,9 @@ final class RequireLockFactoryPass implements CompilerPassInterface
             ->addTag('monolog.logger', ['channel' => 'lock'])
         ;
         $container->getDefinition(self::LOCK_SERVICE)->replaceArgument(0, new Reference('durable.dbal.checked_lock_factory'));
+        if ($container->hasDefinition('durable.dbal.activity_attempt_claim')) {
+            $container->getDefinition('durable.dbal.activity_attempt_claim')->replaceArgument(0, new Reference('durable.dbal.checked_lock_factory'));
+        }
     }
 
     private static function localStoreMessage(string $store): string

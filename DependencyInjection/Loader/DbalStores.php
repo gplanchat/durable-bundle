@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gplanchat\Durable\Bundle\DependencyInjection\Loader;
 
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Gplanchat\Bridge\Dbal\Messenger\LockActivityAttemptClaim;
 use Gplanchat\Bridge\Dbal\Messenger\SingleResumeLockMiddleware;
 use Gplanchat\Bridge\Dbal\Schema\DurableSchema;
 use Gplanchat\Bridge\Dbal\Store\DbalChildWorkflowParentLinkStore;
@@ -141,6 +142,14 @@ final class DbalStores
             ;
             // Read by RequireLockFactoryPass, which refuses a per-process store without it (#259).
             $container->setParameter('durable.dbal.allow_local_lock', $config['dbal']['allow_local_lock']);
+
+            // One worker per activity attempt, through the same factory and TTL: the server's refusal
+            // of a second start, which the DBAL journal has no server to make (#590).
+            $container->register('durable.dbal.activity_attempt_claim', LockActivityAttemptClaim::class)
+                ->setArguments([new Reference($config['dbal']['lock_factory']), $config['dbal']['lock_ttl']])
+                ->setPublic(false)
+            ;
+            $container->getDefinition('durable.activity_message_processor')->setArgument(7, new Reference('durable.dbal.activity_attempt_claim'));
         }
 
         if ($metadataDbal) {

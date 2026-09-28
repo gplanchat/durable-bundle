@@ -3,6 +3,7 @@
         "Doctrine\\DBAL\\Connection",
         "Doctrine\\DBAL\\Exception\\TableNotFoundException",
         "Doctrine\\ORM\\Tools\\Event\\GenerateSchemaEventArgs",
+        "Gplanchat\\Bridge\\Dbal\\Messenger\\LockActivityAttemptClaim",
         "Gplanchat\\Bridge\\Dbal\\Messenger\\SingleResumeLockMiddleware",
         "Gplanchat\\Bridge\\Dbal\\Schema\\DurableSchema",
         "Gplanchat\\Bridge\\Dbal\\Store\\DbalChildWorkflowParentLinkStore",
