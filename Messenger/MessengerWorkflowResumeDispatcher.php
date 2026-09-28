@@ -6,6 +6,7 @@ namespace Gplanchat\Durable\Bundle\Messenger;
 
 use Gplanchat\Durable\Port\WorkflowResumeDispatcher;
 use Gplanchat\Durable\Store\WorkflowMetadataStore;
+use Gplanchat\Durable\Transport\AwaitedFact;
 use Gplanchat\Durable\Transport\ResumeWorkflowMessage;
 use Gplanchat\Durable\Workflow\WorkflowDefinitionLoader;
 use Symfony\Component\Messenger\Envelope;
@@ -31,9 +32,9 @@ final class MessengerWorkflowResumeDispatcher implements WorkflowResumeDispatche
         ));
     }
 
-    public function dispatchResumeAnnouncing(string $executionId, string $activityId): void
+    public function dispatchResumeAwaiting(string $executionId, AwaitedFact $fact): void
     {
-        $message = new ResumeWorkflowMessage($executionId, [], $activityId);
+        $message = new ResumeWorkflowMessage($executionId, [], $fact);
         // No DispatchAfterCurrentBusStamp: held until the activity handler returns, it would leave
         // after the append, and the worker could die before it left.
         if ($this->routedAsynchronously($message)) {
