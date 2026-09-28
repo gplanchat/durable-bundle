@@ -135,6 +135,8 @@ final class MessengerServices
                 ->setArguments([
                     new Reference('messenger.default_bus'),
                     new Reference(WorkflowMetadataStore::class),
+                    // To tell a `sync` resume route apart (DUR050).
+                    new Reference('messenger.senders_locator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                 ])
                 ->setPublic(false)
             ;
