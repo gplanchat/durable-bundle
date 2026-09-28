@@ -17,6 +17,7 @@
         "php": ">=8.2",
         "gplanchat/durable": "self.version",
         "psr/container": "^2.0",
+        "psr/log": "^1.1 || ^2.0 || ^3.0",
         "symfony/event-dispatcher": "^6.4 || ^7.0 || ^8.0",
         "symfony/http-foundation": "^6.4 || ^7.0 || ^8.0",
         "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
