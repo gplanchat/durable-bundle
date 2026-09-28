@@ -41,6 +41,9 @@
         "Symfony\\Component\\Lock\\Store\\FlockStore",
         "Symfony\\Component\\Lock\\Store\\InMemoryStore",
         "Symfony\\Component\\Lock\\Store\\SemaphoreStore",
-        "Symfony\\Component\\Lock\\Store\\StoreFactory"
+        "Symfony\\Component\\Lock\\Store\\StoreFactory",
+        "Symfony\\Component\\Serializer\\Exception\\UnexpectedValueException",
+        "Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface",
+        "Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface"
     ]
 }

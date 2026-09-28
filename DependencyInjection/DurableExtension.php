@@ -41,6 +41,7 @@ final class DurableExtension extends Extension
         CoreServices::registerActivityExecutor($container);
         CoreServices::registerRuntime($container);
         MessengerServices::registerWorkflowMessengerServices($container, $config);
+        MessengerServices::registerSerializerNormalizers($container);
         CoreServices::registerParentChildCoordinator($container);
         // The pass that installs the middleware runs well after the extensions; it reads this
         // choice back here rather than rediscovering it.
