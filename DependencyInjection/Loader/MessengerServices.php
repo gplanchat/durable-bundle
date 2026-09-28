@@ -68,7 +68,7 @@ final class MessengerServices
             return;
         }
 
-        $container->register('durable.activity_transport', InMemoryActivityTransport::class)->setPublic(false);
+        $container->register('durable.activity_transport', InMemoryActivityTransport::class)->setArguments([CoreServices::clock()])->setPublic(false);
         $container->setAlias(ActivityTransportInterface::class, 'durable.activity_transport')->setPublic(true);
     }
 

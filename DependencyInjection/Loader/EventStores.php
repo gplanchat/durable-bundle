@@ -158,7 +158,7 @@ final class EventStores
             return;
         }
 
-        $container->register('durable.event_store.inner', InMemoryEventStore::class)->setPublic(false);
+        $container->register('durable.event_store.inner', InMemoryEventStore::class)->setArguments([CoreServices::clock()])->setPublic(false);
 
         $journal = false !== ($temporalConfig['journal'] ?? true);
         if ($hasDsn) {
@@ -196,7 +196,7 @@ final class EventStores
         }
 
         $container->register('durable.run_catalog.in_memory', InMemoryWorkflowRunCatalog::class)
-            ->setArguments([new Reference('durable.event_store.inner')])
+            ->setArguments([new Reference('durable.event_store.inner'), CoreServices::clock()])
             ->setPublic(false)
         ;
         $catalog = new Reference('durable.run_catalog.in_memory');

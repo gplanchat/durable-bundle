@@ -33,6 +33,8 @@ use Gplanchat\Durable\Transport\ActivityTransportInterface;
 use Gplanchat\Durable\Worker\ActivityMessageProcessor;
 use Gplanchat\Durable\Workflow\WorkflowDefinitionLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -64,6 +66,15 @@ final class CoreServices
         $container->setAlias(\Gplanchat\Durable\ActivityExecutor::class, 'durable.activity_executor')->setPublic(true);
     }
 
+    /**
+     * FrameworkBundle's PSR-20 clock when the application has one; null otherwise, which the core
+     * replaces with its own SystemClock (#617).
+     */
+    public static function clock(): Reference
+    {
+        return new Reference('clock', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+    }
+
     public static function registerRuntime(ContainerBuilder $container): void
     {
         $container->register('durable.runtime', \Gplanchat\Durable\ExecutionRuntime::class)
@@ -72,7 +83,7 @@ final class CoreServices
                 new Reference(ActivityTransportInterface::class),
                 new Reference(\Gplanchat\Durable\ActivityExecutor::class),
                 '%durable.max_activity_retries%',
-                null,
+                self::clock(),
                 true,
                 new Reference(WorkflowExecutionObserverInterface::class),
             ])
@@ -117,6 +128,7 @@ final class CoreServices
     public static function registerEngine(ContainerBuilder $container): void
     {
         $container->register('durable.uuid_generator', \Gplanchat\Durable\Uuid\NativeUuidV7Generator::class)
+            ->setArguments([self::clock()])
             ->setPublic(false);
         $container->setAlias(\Gplanchat\Durable\Uuid\NativeUuidV7Generator::class, 'durable.uuid_generator')->setPublic(false);
         $container->setAlias(\Gplanchat\Durable\Uuid\UuidGeneratorInterface::class, \Gplanchat\Durable\Uuid\NativeUuidV7Generator::class);
@@ -268,6 +280,9 @@ final class CoreServices
                 new Reference(ActivityHeartbeatSenderInterface::class),
                 '%durable.max_activity_retries%',
                 new Reference(WorkflowExecutionObserverInterface::class),
+                // The DBAL journal replaces it with its attempt claim.
+                new Definition(\Gplanchat\Durable\Port\NoActivityAttemptClaim::class),
+                self::clock(),
             ])
             ->setPublic(false)
         ;
