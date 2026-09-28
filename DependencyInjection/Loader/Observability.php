@@ -81,14 +81,12 @@ final class Observability
 
     /**
      * The run catalog, for what a suspended run waits on (#324). Called once every backend has
-     * registered its catalog. Not Temporal's: it tells no wait yet, and a Durable execution id is
-     * not the run id it finds by, so each profiled request would pay a visibility query per
-     * execution for nothing. The panel gets it back once #514 settles which id names a run.
+     * registered its catalog, Temporal's included: it finds a run by its execution id through
+     * `DescribeWorkflowExecution` and reads the wait from the `durableWaitingOn` memo (#514).
      */
     public static function handTheRunCatalogToTheProfiler(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('durable.data_collector') || !$container->hasAlias(WorkflowRunCatalogInterface::class)
-            || 'durable.run_catalog.temporal' === (string) $container->getAlias(WorkflowRunCatalogInterface::class)) {
+        if (!$container->hasDefinition('durable.data_collector') || !$container->hasAlias(WorkflowRunCatalogInterface::class)) {
             return;
         }
 
