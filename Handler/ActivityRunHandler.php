@@ -28,12 +28,10 @@ final class ActivityRunHandler
             $failure = $this->activityMessageProcessor->process($message);
         } catch (ActivityAttemptDeferred $deferred) {
             // Another worker holds the attempt: Messenger retries a recoverable failure whatever
-            // `max_retries` says, so the copy runs once the holder's claim is gone (#590). The delay
-            // argument arrived after 6.4, whose constructor refuses a fourth argument: there, the
-            // transport's retry strategy spaces the retries.
-            throw (new \ReflectionClass(RecoverableMessageHandlingException::class))->hasMethod('getRetryDelay')
-                ? new RecoverableMessageHandlingException($deferred->getMessage(), 0, $deferred, ActivityAttemptDeferred::RETRY_AFTER_SECONDS * 1000)
-                : new RecoverableMessageHandlingException($deferred->getMessage(), 0, $deferred);
+            // `max_retries` says, so the copy runs once the holder's claim is gone (#590).
+            // ponytail: the transport's retry strategy spaces the retries; the exception's own delay
+            // argument exists only after Symfony 6.4.
+            throw new RecoverableMessageHandlingException($deferred->getMessage(), 0, $deferred);
         }
         if (null !== $failure) {
             throw new UnrecoverableMessageHandlingException($failure->getMessage(), 0, $failure);
