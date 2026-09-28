@@ -18,6 +18,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class RetryLimitNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function normalize(mixed $data, ?string $format = null, array $context = []): int
     {
         \assert($data instanceof RetryLimit);
@@ -25,11 +28,17 @@ final class RetryLimitNormalizer implements NormalizerInterface, DenormalizerInt
         return $data->toWireValue();
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof RetryLimit;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): RetryLimit
     {
         if (!\is_int($data)) {
@@ -39,6 +48,9 @@ final class RetryLimitNormalizer implements NormalizerInterface, DenormalizerInt
         return RetryLimit::fromWireValue($data);
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return RetryLimit::class === $type;

@@ -20,6 +20,9 @@ final class DurationNormalizer implements NormalizerInterface, DenormalizerInter
 {
     private const INFINITY = 'infinity';
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function normalize(mixed $data, ?string $format = null, array $context = []): float|string
     {
         \assert($data instanceof Duration);
@@ -27,11 +30,17 @@ final class DurationNormalizer implements NormalizerInterface, DenormalizerInter
         return $data->isInfinite() ? self::INFINITY : $data->toSeconds();
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Duration;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): Duration
     {
         if (self::INFINITY === $data) {
@@ -48,6 +57,9 @@ final class DurationNormalizer implements NormalizerInterface, DenormalizerInter
         }
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return Duration::class === $type;

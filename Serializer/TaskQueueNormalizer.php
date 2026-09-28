@@ -15,6 +15,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class TaskQueueNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function normalize(mixed $data, ?string $format = null, array $context = []): string
     {
         \assert($data instanceof TaskQueue);
@@ -22,11 +25,17 @@ final class TaskQueueNormalizer implements NormalizerInterface, DenormalizerInte
         return $data->name();
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof TaskQueue;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): TaskQueue
     {
         if (!\is_string($data)) {
@@ -40,6 +49,9 @@ final class TaskQueueNormalizer implements NormalizerInterface, DenormalizerInte
         }
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return TaskQueue::class === $type;
