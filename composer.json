@@ -18,6 +18,7 @@
         "gplanchat/durable": "self.version",
         "psr/container": "^2.0",
         "symfony/event-dispatcher": "^6.4 || ^7.0 || ^8.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
         "symfony/http-foundation": "^6.4 || ^7.0 || ^8.0",
         "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
         "symfony/console": "^6.4 || ^7.0 || ^8.0",
@@ -28,7 +29,7 @@
     },
     "suggest": {
         "phpunit/phpunit": "Required by the shipped test helper (Testing\\DurableBundleTestTrait)",
-        "symfony/framework-bundle": "Required by consumers of the shipped test helper (Testing\\DurableBundleTestTrait), whose static::getContainer() resolves against a KernelTestCase",
+        "symfony/twig-bundle": "Renders the Durable profiler panel (Resources/views), with symfony/web-profiler-bundle",
         "symfony/web-profiler-bundle": "Web Debug Toolbar and profiler: Durable panel (workflows / activities)",
         "doctrine/orm": "Declares the DBAL journal tables to doctrine:schema:update and doctrine:migrations:diff, which would otherwise generate DROP TABLE for them (SchemaListener\\DurableSchemaListener)",
         "gplanchat/durable-bridge-temporal": "Temporal backend: DurableExtension wires its client, stores and worker transports when durable.temporal.dsn is set",

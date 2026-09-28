@@ -16,7 +16,7 @@ Symfony bundle for **`gplanchat/durable`**: configuration, autoconfiguration of 
 ## Requirements
 
 - PHP **8.2+**
-- Symfony **6.4 || 7.4** (`framework-bundle`, `messenger`, etc. — see `composer.json`)
+- Symfony **6.4, 7.x or 8.x** (`framework-bundle`, `messenger`, etc. — see `composer.json`)
 
 ## Documentation
 
@@ -33,7 +33,7 @@ Register the bundle in your kernel and add `config/packages/durable.yaml` (see t
 
 ## Suggested dev dependency
 
-- `symfony/web-profiler-bundle` — Durable toolbar / profiler panel (see `composer.json` `suggest`)
+- `symfony/web-profiler-bundle` and `symfony/twig-bundle` — Durable toolbar / profiler panel (see `composer.json` `suggest`)
 
 ## License
 
