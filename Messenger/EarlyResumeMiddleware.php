@@ -16,8 +16,9 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 /**
  * What an early resume becomes on Messenger (#606).
  *
- * Under DUR050 the activity worker sends a resume before it appends the outcome, and another after.
- * The early one that finds its outcome missing waits by failing, and the transport's retries are the
+ * Under DUR050 and DUR052 a worker sends a resume before it appends the fact it announces (an
+ * activity's outcome, a signal, a child's outcome, a fired timer), and another after. The early one
+ * that finds its fact missing waits by failing, and the transport's retries are the
  * wait. Left to the retry strategy, a resume that ran out of retries went to the failure transport,
  * where it read as a lost run, although the resume sent after the append carried the execution.
  *
@@ -52,9 +53,9 @@ final class EarlyResumeMiddleware implements MiddlewareInterface
                 throw new RecoverableMessageHandlingException($early->getMessage(), 0, $e);
             }
 
-            $this->logger?->info('Durable: dropped an early resume of execution {execution} after {retries} retries; activity {activity} has no outcome yet, and the resume sent after its append carries the run (DUR050).', [
+            $this->logger?->info('Durable: dropped an early resume of execution {execution} after {retries} retries; {awaited} is not journalled yet, and the resume sent after its append carries the run (DUR050, DUR052).', [
                 'execution' => $early->executionId,
-                'activity' => $early->activityId,
+                'awaited' => $early->awaited->describe(),
                 'retries' => $retries,
             ]);
 
