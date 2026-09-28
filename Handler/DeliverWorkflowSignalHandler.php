@@ -7,10 +7,15 @@ namespace Gplanchat\Durable\Bundle\Handler;
 use Gplanchat\Durable\Event\WorkflowSignalReceived;
 use Gplanchat\Durable\Port\WorkflowResumeDispatcher;
 use Gplanchat\Durable\Store\EventStoreInterface;
+use Gplanchat\Durable\Transport\AwaitedFact;
 use Gplanchat\Durable\Transport\DeliverWorkflowSignalMessage;
 
 /**
- * Append {@see WorkflowSignalReceived} then {@see WorkflowResumeDispatcher::dispatchResume()}.
+ * Journals a delivered signal, in DUR052's order: a resume naming it, the append, a plain resume.
+ *
+ * The signal carries its delivery's request id, so a redelivered message finds it already in the
+ * journal: it appends nothing more, and still resumes, since the crash that caused the redelivery
+ * may have come before the resume.
  */
 final class DeliverWorkflowSignalHandler
 {
@@ -21,11 +26,16 @@ final class DeliverWorkflowSignalHandler
 
     public function __invoke(DeliverWorkflowSignalMessage $message): void
     {
-        $this->eventStore->append(new WorkflowSignalReceived(
-            $message->executionId,
-            $message->signalName,
-            $message->payload,
-        ));
+        $signal = AwaitedFact::signal($message->requestId);
+        if (!$signal->isJournalledIn($this->eventStore, $message->executionId)) {
+            $this->resumeDispatcher->dispatchResumeAwaiting($message->executionId, $signal);
+            $this->eventStore->append(new WorkflowSignalReceived(
+                $message->executionId,
+                $message->signalName,
+                $message->payload,
+                $message->requestId,
+            ));
+        }
         $this->resumeDispatcher->dispatchResume($message->executionId);
     }
 }
