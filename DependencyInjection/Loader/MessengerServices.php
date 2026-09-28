@@ -12,6 +12,9 @@ use Gplanchat\Durable\Bundle\DependencyInjection\DurableExtension;
 use Gplanchat\Durable\Bundle\Messenger\EarlyResumeMiddleware;
 use Gplanchat\Durable\Bundle\Messenger\MessengerWorkflowResumeDispatcher;
 use Gplanchat\Durable\Bundle\Profiler\DurableExecutionTrace;
+use Gplanchat\Durable\Bundle\Serializer\DurationNormalizer;
+use Gplanchat\Durable\Bundle\Serializer\RetryLimitNormalizer;
+use Gplanchat\Durable\Bundle\Serializer\TaskQueueNormalizer;
 use Gplanchat\Durable\Bundle\Transport\MessengerActivityTransport;
 use Gplanchat\Durable\Handler\ResumeWorkflowHandler;
 use Gplanchat\Durable\Observation\WorkflowRunPickupProjectionInterface;
@@ -28,6 +31,7 @@ use Gplanchat\Durable\Workflow\WorkflowDefinitionLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * What runs Durable over Symfony Messenger: the activity transport, the resume and timer dispatchers and their handlers.
@@ -169,5 +173,27 @@ final class MessengerServices
                 ->setPublic(false)
             ;
         }
+    }
+
+    /**
+     * A transport set to `messenger.transport.symfony_serializer` carries every Durable message as
+     * JSON; the ObjectNormalizer recurses without end on Duration and RetryLimit, and loses a
+     * TaskQueue's name (#643). Only when
+     * symfony/serializer is installed: without it, there is no serializer to join.
+     */
+    public static function registerSerializerNormalizers(ContainerBuilder $container): void
+    {
+        if (!interface_exists(NormalizerInterface::class)) {
+            return;
+        }
+        $container->register('durable.serializer.duration_normalizer', DurationNormalizer::class)
+            ->addTag('serializer.normalizer')
+            ->setPublic(false);
+        $container->register('durable.serializer.retry_limit_normalizer', RetryLimitNormalizer::class)
+            ->addTag('serializer.normalizer')
+            ->setPublic(false);
+        $container->register('durable.serializer.task_queue_normalizer', TaskQueueNormalizer::class)
+            ->addTag('serializer.normalizer')
+            ->setPublic(false);
     }
 }

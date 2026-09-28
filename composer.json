@@ -28,7 +28,11 @@
         "symfony/messenger": "^6.4 || ^7.0 || ^8.0",
         "symfony/service-contracts": "^3.0"
     },
+    "require-dev": {
+        "symfony/serializer": "^6.4 || ^7.0 || ^8.0"
+    },
     "suggest": {
+        "symfony/serializer": "Normalizers for Duration, RetryLimit and TaskQueue, registered when installed: a Messenger transport set to messenger.transport.symfony_serializer needs them to carry activity messages",
         "phpunit/phpunit": "Required by the shipped test helper (Testing\\DurableBundleTestTrait)",
         "symfony/twig-bundle": "Renders the Durable profiler panel (Resources/views), with symfony/web-profiler-bundle",
         "symfony/web-profiler-bundle": "Web Debug Toolbar and profiler: Durable panel (workflows / activities)",
