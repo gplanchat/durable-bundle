@@ -8,6 +8,7 @@ use Gplanchat\Durable\Bundle\Command\DiagnoseExecutionCommand;
 use Gplanchat\Durable\Bundle\Command\DurableWorkerCommand;
 use Gplanchat\Durable\Bundle\DependencyInjection\DurableExtension;
 use Gplanchat\Durable\Bundle\EventListener\RefuseResetOnInMemoryTransportListener;
+use Gplanchat\Durable\Bundle\EventListener\WarnOnIgnoredWorkerLimitsListener;
 use Gplanchat\Durable\Bundle\Messenger\DurableWorkerInspection;
 use Gplanchat\Durable\Observation\KeyPatternPayloadRedactor;
 use Gplanchat\Durable\Observation\PayloadRedactorInterface;
@@ -90,5 +91,14 @@ final class Commands
             ->addTag('kernel.event_listener', ['event' => WorkerStartedEvent::class])
             ->setPublic(false)
         ;
+        // Only where the inspected names are the Temporal workers: elsewhere they are real
+        // transports, and --limit works on them (#353).
+        if ($isTemporalNative) {
+            $container->register(WarnOnIgnoredWorkerLimitsListener::class)
+                ->setArguments([new Reference(DurableWorkerInspection::class), new Reference('logger')])
+                ->addTag('kernel.event_listener', ['event' => WorkerStartedEvent::class])
+                ->setPublic(false)
+            ;
+        }
     }
 }
