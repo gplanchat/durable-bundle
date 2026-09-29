@@ -255,7 +255,7 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
             }
         }
 
-        if (null !== $metadata && ($metadata['completed'] ?? false) === false && $this->metadataStore->hasActiveWorkflowMetadata($executionId)) {
+        if (null !== $metadata && ($metadata['completed'] ?? false) === false && $this->metadataStore->hasActiveWorkflowMetadata(ExecutionId::fromString($executionId))) {
             return 'running';
         }
 
@@ -865,7 +865,7 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
      */
     private function metadata(string $executionId): ?array
     {
-        $meta = $this->metadataStore->get($executionId);
+        $meta = $this->metadataStore->get(ExecutionId::fromString($executionId));
         if (null !== $meta) {
             $payload = $this->redacted($meta['payload']);
             $meta['payload'] = \is_array($payload) ? $payload : [];

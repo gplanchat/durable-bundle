@@ -7,6 +7,7 @@ namespace Gplanchat\Durable\Bundle\Testing;
 use Gplanchat\Durable\Bundle\DataCollector\DurableDataCollector;
 use Gplanchat\Durable\Event\ExecutionCompleted;
 use Gplanchat\Durable\Event\WorkflowExecutionFailed;
+use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Port\WorkflowResumeDispatcher;
 use Gplanchat\Durable\Query\WorkflowQueryEvaluator;
 use Gplanchat\Durable\Store\EventStoreInterface;
@@ -112,11 +113,11 @@ trait DurableBundleTestTrait
             }
 
             ++$idleStreak;
-            if ($hadMessage && $idleStreak > 30 && !$metadataStore->hasActiveWorkflowMetadata($executionId)) {
+            if ($hadMessage && $idleStreak > 30 && !$metadataStore->hasActiveWorkflowMetadata(ExecutionId::fromString($executionId))) {
                 break;
             }
 
-            if ($metadataStore->hasActiveWorkflowMetadata($executionId)) {
+            if ($metadataStore->hasActiveWorkflowMetadata(ExecutionId::fromString($executionId))) {
                 usleep(100_000);
             } else {
                 usleep(1_000);

@@ -54,7 +54,7 @@ final class MessengerWorkflowResumeDispatcher implements WorkflowResumeDispatche
         // A caller passing `::class` gets the alias: the name the journal, the dashboard and the
         // diagnose command all show (#258).
         $workflowType = (new WorkflowDefinitionLoader())->aliasForTemporalInterop($workflowType);
-        $this->metadataStore->save($executionId, $workflowType, $payload);
+        $this->metadataStore->save(ExecutionId::fromString($executionId), $workflowType, $payload);
         $this->bus->dispatch(new Envelope(
             new ResumeWorkflowMessage($executionId),
             [new DispatchAfterCurrentBusStamp(), new NewWorkflowRunStamp($workflowType)],
