@@ -26,14 +26,13 @@ final class MessengerWorkflowTimerDispatcher implements WorkflowTimerDispatcher
         private readonly MessageBusInterface $messageBus,
     ) {}
 
-    public function dispatchTimerFire(ExecutionId|string $executionId, int $delayMs = 0): void
+    public function dispatchTimerFire(ExecutionId $executionId, int $delayMs = 0): void
     {
-        $executionId = (string) $executionId;
         $stamps = [new DispatchAfterCurrentBusStamp()];
         if ($delayMs > 0) {
             $stamps[] = new DelayStamp($delayMs);
         }
 
-        $this->messageBus->dispatch(new Envelope(new FireWorkflowTimersMessage($executionId), $stamps));
+        $this->messageBus->dispatch(new Envelope(new FireWorkflowTimersMessage($executionId->toString()), $stamps));
     }
 }
