@@ -228,7 +228,7 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
                     'operation' => $operation->operation,
                     'state' => $operation->state->value,
                     'stateLabel' => $operation->state->label(),
-                ], NexusOperationSummary::ofHistory(array_column($this->journal($eid)['entries'], 'event'))),
+                ], NexusOperationSummary::of(array_column($this->journal($eid)['entries'], 'event'))),
             ];
         }
 

@@ -352,6 +352,9 @@
                                     {# The waits served by someone else (#670): where, and whether they are settled. #}
                                     {% if ex.nexusOperations|default([])|length > 0 %}
                                         <h4>Nexus operations</h4>
+                                        {% if ex.storeTruncated %}
+                                            <p class="help">The journal is truncated: a state below may already be settled, and later operations are missing.</p>
+                                        {% endif %}
                                         <table>
                                             <thead>
                                                 <tr><th>Endpoint</th><th>Service</th><th>Operation</th><th>State</th></tr>
