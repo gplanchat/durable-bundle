@@ -8,6 +8,7 @@ use Gplanchat\Bridge\Temporal\TemporalConnection;
 use Gplanchat\Bridge\Temporal\WorkflowServiceClientFactory;
 use Gplanchat\Durable\Event\ExecutionStarted;
 use Gplanchat\Durable\Event\WorkflowContinuedAsNew;
+use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Observation\KeyPatternPayloadRedactor;
 use Gplanchat\Durable\Observation\PayloadRedactorInterface;
 use Gplanchat\Durable\Observation\RecordedDetails;
@@ -66,19 +67,23 @@ final class DiagnoseExecutionCommand extends Command
         $asJson = (bool) $input->getOption('json');
         $redact = $input->getOption('raw') ? static fn(mixed $payload): mixed => $payload : $this->redactor->redact(...);
 
-        $meta = $this->workflowMetadataStore->get($executionId);
+        $id = ExecutionId::fromString($executionId);
+        $meta = $this->workflowMetadataStore->get($id);
         if (null !== $meta) {
             $meta['payload'] = $redact(RecordedDetails::storable($meta['payload']));
         }
-        $parentId = $this->childWorkflowParentLinkStore->getParentExecutionId($executionId);
-        $childIds = $this->childWorkflowParentLinkStore->getChildExecutionIdsForParent($executionId);
+        $parentId = $this->childWorkflowParentLinkStore->getParentExecutionId($id)?->toString();
+        $childIds = array_map(
+            static fn(ExecutionId $child): string => $child->toString(),
+            $this->childWorkflowParentLinkStore->getChildExecutionIdsForParent($id),
+        );
 
-        $totalEvents = $this->eventStore->countEventsInStream($executionId);
+        $totalEvents = $this->eventStore->countEventsInStream($id);
         $histogram = [];
         $sample = [];
         $continuedFrom = null;
         $continuedAs = null;
-        foreach ($this->eventStore->readStreamWithRecordedAt($executionId) as $row) {
+        foreach ($this->eventStore->readStreamWithRecordedAt($id) as $row) {
             $event = $row['event'];
             $short = $this->shortClassName($event::class);
             $histogram[$short] = ($histogram[$short] ?? 0) + 1;
