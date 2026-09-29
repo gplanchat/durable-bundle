@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gplanchat\Durable\Bundle\Transport;
 
+use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Port\WorkflowTimerDispatcher;
 use Gplanchat\Durable\Transport\FireWorkflowTimersMessage;
 use Symfony\Component\Messenger\Envelope;
@@ -25,13 +26,13 @@ final class MessengerWorkflowTimerDispatcher implements WorkflowTimerDispatcher
         private readonly MessageBusInterface $messageBus,
     ) {}
 
-    public function dispatchTimerFire(string $executionId, int $delayMs = 0): void
+    public function dispatchTimerFire(ExecutionId $executionId, int $delayMs = 0): void
     {
         $stamps = [new DispatchAfterCurrentBusStamp()];
         if ($delayMs > 0) {
             $stamps[] = new DelayStamp($delayMs);
         }
 
-        $this->messageBus->dispatch(new Envelope(new FireWorkflowTimersMessage($executionId), $stamps));
+        $this->messageBus->dispatch(new Envelope(new FireWorkflowTimersMessage($executionId->toString()), $stamps));
     }
 }
