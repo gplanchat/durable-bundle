@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gplanchat\Durable\Bundle\Messenger;
 
 use Gplanchat\Durable\Bundle\Profiler\DurableExecutionTrace;
+use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Transport\ResumeWorkflowMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -29,7 +30,7 @@ final class WorkflowRunDispatchProfilerMiddleware implements MiddlewareInterface
             // The message carries no type: only the stamp tells a new run from a resume.
             $newRun = $envelope->last(NewWorkflowRunStamp::class);
             $this->trace->onWorkflowDispatchRequested(
-                $message->executionId,
+                ExecutionId::fromString($message->executionId),
                 $newRun->workflowType ?? '',
                 [],
                 null === $newRun,
