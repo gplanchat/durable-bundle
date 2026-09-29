@@ -32,7 +32,7 @@ final class DeliverWorkflowSignalHandler
         if (!$signal->isJournalledIn($this->eventStore, $message->executionId)) {
             $this->resumeDispatcher->dispatchResumeAwaiting($id, $signal);
             $this->eventStore->append(new WorkflowSignalReceived(
-                $message->executionId,
+                ExecutionId::fromString($message->executionId),
                 $message->signalName,
                 $message->payload,
                 $message->requestId,
