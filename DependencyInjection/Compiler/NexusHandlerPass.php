@@ -152,6 +152,13 @@ final class NexusHandlerPass implements CompilerPassInterface
             $container->getDefinition('durable.temporal.nexus_receiver')
                 ->addTag('messenger.receiver', ['alias' => 'durable_nexus']);
         }
+        // …and `durable:health` expects a worker on its queue.
+        if ($container->hasDefinition('durable.command.health')) {
+            $health = $container->getDefinition('durable.command.health');
+            /** @var list<string> $roles */
+            $roles = $health->getArgument(1);
+            $health->replaceArgument(1, [...$roles, 'nexus']);
+        }
     }
 
     /**
