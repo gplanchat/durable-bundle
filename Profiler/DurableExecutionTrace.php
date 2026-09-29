@@ -6,6 +6,7 @@ namespace Gplanchat\Durable\Bundle\Profiler;
 
 use Gplanchat\Durable\Debug\WorkflowDispatchObserverInterface;
 use Gplanchat\Durable\Debug\WorkflowExecutionObserverInterface;
+use Gplanchat\Durable\ExecutionId;
 
 /**
  * Process trace for one HTTP request: {@see \Gplanchat\Durable\Transport\ResumeWorkflowMessage} dispatches
@@ -41,12 +42,13 @@ final class DurableExecutionTrace implements WorkflowExecutionObserverInterface,
      */
     #[\Override]
     public function onWorkflowDispatchRequested(
-        string $executionId,
+        ExecutionId|string $executionId,
         string $workflowType,
         array $payload,
         bool $isResume,
         ?string $transportNames,
     ): void {
+        $executionId = (string) $executionId;
         $this->record([
             'seq' => ++$this->seq,
             'at' => microtime(true),
@@ -60,8 +62,9 @@ final class DurableExecutionTrace implements WorkflowExecutionObserverInterface,
     }
 
     #[\Override]
-    public function onWorkflowRun(string $executionId, string $workflowType, bool $isResume): void
+    public function onWorkflowRun(ExecutionId|string $executionId, string $workflowType, bool $isResume): void
     {
+        $executionId = (string) $executionId;
         $this->record([
             'seq' => ++$this->seq,
             'at' => microtime(true),
@@ -74,13 +77,14 @@ final class DurableExecutionTrace implements WorkflowExecutionObserverInterface,
 
     #[\Override]
     public function onActivityExecuted(
-        string $executionId,
+        ExecutionId|string $executionId,
         string $activityId,
         string $activityName,
         float $durationSeconds,
         bool $success,
         ?string $errorClass,
     ): void {
+        $executionId = (string) $executionId;
         $this->record([
             'seq' => ++$this->seq,
             'at' => microtime(true),
