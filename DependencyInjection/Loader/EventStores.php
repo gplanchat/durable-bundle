@@ -13,6 +13,7 @@ use Gplanchat\Bridge\Temporal\Messenger\TemporalActivityWorkerTransport;
 use Gplanchat\Bridge\Temporal\Messenger\TemporalJournalTransport;
 use Gplanchat\Bridge\Temporal\Messenger\TemporalNexusWorkerTransport;
 use Gplanchat\Bridge\Temporal\Store\TemporalReadThroughEventStore;
+use Gplanchat\Bridge\Temporal\Store\TemporalTaskQueueProbe;
 use Gplanchat\Bridge\Temporal\Store\TemporalWorkflowRunCatalog;
 use Gplanchat\Bridge\Temporal\TemporalConnection;
 use Gplanchat\Bridge\Temporal\TemporalRuntimeAssembly;
@@ -24,7 +25,9 @@ use Gplanchat\Bridge\Temporal\WorkflowClient;
 use Gplanchat\Bridge\Temporal\WorkflowClientInterface;
 use Gplanchat\Bridge\Temporal\WorkflowServiceClientFactory;
 use Gplanchat\Bridge\Temporal\WorkflowServiceClientInterface;
+use Gplanchat\Durable\Bundle\Command\HealthCommand;
 use Gplanchat\Durable\Bundle\DependencyInjection\DurableExtension;
+use Gplanchat\Durable\Bundle\Observation\WorkerPresence;
 use Gplanchat\Durable\Nexus\Serving\NexusOperationRegistry;
 use Gplanchat\Durable\Observation\WorkflowRunPickupProjectionInterface;
 use Gplanchat\Durable\Port\ActivityHeartbeatSenderInterface;
@@ -256,6 +259,24 @@ final class EventStores
         // which loop each name runs. NexusHandlerPass tags the Nexus one once a handler exists.
         $container->register('durable.temporal.nexus_receiver', TemporalNexusWorkerTransport::class)
             ->setArguments([new Reference('durable.temporal.nexus_worker')])
+        ;
+
+        // `durable:health` checks the roles that poll this cluster: workflow and activity only when
+        // it holds the journal; NexusHandlerPass adds nexus once something serves it.
+        $container->register('durable.worker_presence', WorkerPresence::class)
+            ->setArguments([
+                (new Definition(TemporalTaskQueueProbe::class))->setArguments([
+                    new Reference('durable.temporal.workflow_service_client'),
+                    new Reference('durable.temporal.connection'),
+                ]),
+                DurableExtension::isTemporalNative($config) ? ['workflow', 'activity'] : [],
+            ])
+            ->setPublic(false)
+        ;
+        $container->register('durable.command.health', HealthCommand::class)
+            ->setArguments([new Reference('durable.worker_presence')])
+            ->addTag('console.command', ['command' => 'durable:health'])
+            ->setPublic(false)
         ;
 
         // Without the journal, workflows run locally and the application's own
