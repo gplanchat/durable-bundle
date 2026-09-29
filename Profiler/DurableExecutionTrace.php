@@ -42,18 +42,17 @@ final class DurableExecutionTrace implements WorkflowExecutionObserverInterface,
      */
     #[\Override]
     public function onWorkflowDispatchRequested(
-        ExecutionId|string $executionId,
+        ExecutionId $executionId,
         string $workflowType,
         array $payload,
         bool $isResume,
         ?string $transportNames,
     ): void {
-        $executionId = (string) $executionId;
         $this->record([
             'seq' => ++$this->seq,
             'at' => microtime(true),
             'kind' => 'dispatch',
-            'executionId' => $executionId,
+            'executionId' => $executionId->toString(),
             'workflowType' => $workflowType,
             'payload' => $payload,
             'isResume' => $isResume,
@@ -62,14 +61,13 @@ final class DurableExecutionTrace implements WorkflowExecutionObserverInterface,
     }
 
     #[\Override]
-    public function onWorkflowRun(ExecutionId|string $executionId, string $workflowType, bool $isResume): void
+    public function onWorkflowRun(ExecutionId $executionId, string $workflowType, bool $isResume): void
     {
-        $executionId = (string) $executionId;
         $this->record([
             'seq' => ++$this->seq,
             'at' => microtime(true),
             'kind' => 'workflow',
-            'executionId' => $executionId,
+            'executionId' => $executionId->toString(),
             'workflowType' => $workflowType,
             'isResume' => $isResume,
         ]);
@@ -77,19 +75,18 @@ final class DurableExecutionTrace implements WorkflowExecutionObserverInterface,
 
     #[\Override]
     public function onActivityExecuted(
-        ExecutionId|string $executionId,
+        ExecutionId $executionId,
         string $activityId,
         string $activityName,
         float $durationSeconds,
         bool $success,
         ?string $errorClass,
     ): void {
-        $executionId = (string) $executionId;
         $this->record([
             'seq' => ++$this->seq,
             'at' => microtime(true),
             'kind' => 'activity',
-            'executionId' => $executionId,
+            'executionId' => $executionId->toString(),
             'activityId' => $activityId,
             'activityName' => $activityName,
             'durationSeconds' => $durationSeconds,

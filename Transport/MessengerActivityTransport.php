@@ -100,10 +100,8 @@ final class MessengerActivityTransport implements ActivityTransportInterface
         return true;
     }
 
-    public function removePendingFor(ExecutionId|string $executionId, string $activityId): bool
+    public function removePendingFor(ExecutionId $executionId, string $activityId): bool
     {
-        $executionId = (string) $executionId;
-
         return false;
     }
 }
