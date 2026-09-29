@@ -24,7 +24,7 @@ final class WarnOnSharedJournalConnectionPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('durable.dbal.schema')) {
+        if (!$container->hasDefinition('durable.dbal.schema') || !$container->has('logger')) {
             return;
         }
 
