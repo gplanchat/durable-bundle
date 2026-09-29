@@ -273,6 +273,7 @@ final class EventStores
             ])
             ->setPublic(false)
         ;
+        $container->setAlias(WorkerPresence::class, 'durable.worker_presence')->setPublic(false);
         $container->register('durable.command.health', HealthCommand::class)
             ->setArguments([new Reference('durable.worker_presence')])
             ->addTag('console.command', ['command' => 'durable:health'])
