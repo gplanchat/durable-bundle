@@ -30,6 +30,7 @@ use Gplanchat\Durable\Event\WorkflowUpdateHandled;
 use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Observation\JournalRunHistoryReader;
 use Gplanchat\Durable\Observation\KeyPatternPayloadRedactor;
+use Gplanchat\Durable\Observation\NexusOperationSummary;
 use Gplanchat\Durable\Observation\PayloadRedactorInterface;
 use Gplanchat\Durable\Observation\RecordedDetails;
 use Gplanchat\Durable\Port\WorkflowRunCatalogInterface;
@@ -220,6 +221,14 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
                 'storeRows' => $rows,
                 'timelineEntries' => $groupedTimeline[$eid] ?? [],
                 'journalHint' => $this->buildJournalHint($rows, $storeCountLive, $timelineHasDispatch),
+                // Where each Nexus operation is served, and whether it is still in flight (#670).
+                'nexusOperations' => array_map(static fn(NexusOperationSummary $operation): array => [
+                    'endpoint' => $operation->endpoint,
+                    'service' => $operation->service,
+                    'operation' => $operation->operation,
+                    'state' => $operation->state->value,
+                    'stateLabel' => $operation->state->label(),
+                ], NexusOperationSummary::of(array_column($this->journal($eid)['entries'], 'event'))),
             ];
         }
 
