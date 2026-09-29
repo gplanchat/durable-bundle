@@ -10,6 +10,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -43,6 +44,8 @@ final class HealthCommand extends Command
             return Command::SUCCESS;
         }
 
+        // Failures go to stderr, where an alerting script looks besides the exit code.
+        $errors = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
         $since = new \DateTimeImmutable(\sprintf('-%d seconds', self::SILENCE_SECONDS));
         $healthy = true;
         foreach ($this->probe->describe(array_map(static fn(string $role): TaskQueueKind => TaskQueueKind::from($role), $this->roles)) as $queue) {
@@ -52,9 +55,10 @@ final class HealthCommand extends Command
                 continue;
             }
             $healthy = false;
-            $output->writeln(null !== $queue->error
-                ? \sprintf('<error>%s: could not ask the cluster who polls %s: %s</error>', $role, $queue->taskQueue, OutputFormatter::escape($queue->error))
-                : \sprintf('<error>%s: no worker has polled %s in %ds. Start bin/console durable:worker --role=%1$s.</error>', $role, $queue->taskQueue, self::SILENCE_SECONDS));
+            $taskQueue = OutputFormatter::escape($queue->taskQueue);
+            $errors->writeln(null !== $queue->error
+                ? \sprintf('<error>%s: could not ask the cluster who polls %s: %s</error>', $role, $taskQueue, OutputFormatter::escape($queue->error))
+                : \sprintf('<error>%s: no worker has polled %s in %ds. Start bin/console durable:worker --role=%1$s.</error>', $role, $taskQueue, self::SILENCE_SECONDS));
         }
 
         return $healthy ? Command::SUCCESS : Command::FAILURE;
