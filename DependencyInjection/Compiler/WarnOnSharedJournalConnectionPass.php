@@ -38,7 +38,8 @@ final class WarnOnSharedJournalConnectionPass implements CompilerPassInterface
             return;
         }
 
-        $container->register(WarnOnSharedJournalConnectionListener::class)
+        // The class explicitly: this pass runs after ResolveClassPass, which infers it from the id.
+        $container->register(WarnOnSharedJournalConnectionListener::class, WarnOnSharedJournalConnectionListener::class)
             ->setArguments([new Reference('logger'), $id])
             ->addTag('kernel.event_listener', ['event' => WorkerStartedEvent::class])
             ->setPublic(false)
