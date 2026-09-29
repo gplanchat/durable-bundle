@@ -128,7 +128,7 @@ trait DurableBundleTestTrait
         if (null === WorkflowQueryEvaluator::lastExecutionResult($eventStore, $executionId)) {
             // The workflow is allowed to fail (WorkflowExecutionFailed)
             $hasFailed = false;
-            foreach ($eventStore->readStream($executionId) as $event) {
+            foreach ($eventStore->readStream(ExecutionId::fromString($executionId)) as $event) {
                 if ($event instanceof WorkflowExecutionFailed) {
                     $hasFailed = true;
                     break;
@@ -153,7 +153,7 @@ trait DurableBundleTestTrait
     {
         $eventStore = $this->getEventStoreService();
         $completed = null;
-        foreach ($eventStore->readStream($executionId) as $event) {
+        foreach ($eventStore->readStream(ExecutionId::fromString($executionId)) as $event) {
             if ($event instanceof ExecutionCompleted) {
                 $completed = $event;
                 break;
