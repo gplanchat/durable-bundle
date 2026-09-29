@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gplanchat\Durable\Bundle\Messenger;
 
+use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Port\WorkflowResumeDispatcher;
 use Gplanchat\Durable\Store\WorkflowMetadataStore;
 use Gplanchat\Durable\Transport\AwaitedFact;
@@ -24,16 +25,18 @@ final class MessengerWorkflowResumeDispatcher implements WorkflowResumeDispatche
         private readonly ?SendersLocatorInterface $senders = null,
     ) {}
 
-    public function dispatchResume(string $executionId, array $pendingUpdates = []): void
+    public function dispatchResume(ExecutionId|string $executionId, array $pendingUpdates = []): void
     {
+        $executionId = (string) $executionId;
         $this->bus->dispatch(new Envelope(
             new ResumeWorkflowMessage($executionId, $pendingUpdates),
             [new DispatchAfterCurrentBusStamp()],
         ));
     }
 
-    public function dispatchResumeAwaiting(string $executionId, AwaitedFact $fact): void
+    public function dispatchResumeAwaiting(ExecutionId|string $executionId, AwaitedFact $fact): void
     {
+        $executionId = (string) $executionId;
         $message = new ResumeWorkflowMessage($executionId, [], $fact);
         // No DispatchAfterCurrentBusStamp: held until the activity handler returns, it would leave
         // after the append, and the worker could die before it left.
@@ -45,8 +48,9 @@ final class MessengerWorkflowResumeDispatcher implements WorkflowResumeDispatche
     /**
      * @param array<string, mixed> $payload
      */
-    public function dispatchNewWorkflowRun(string $executionId, string $workflowType, array $payload): void
+    public function dispatchNewWorkflowRun(ExecutionId|string $executionId, string $workflowType, array $payload): void
     {
+        $executionId = (string) $executionId;
         // A caller passing `::class` gets the alias: the name the journal, the dashboard and the
         // diagnose command all show (#258).
         $workflowType = (new WorkflowDefinitionLoader())->aliasForTemporalInterop($workflowType);
