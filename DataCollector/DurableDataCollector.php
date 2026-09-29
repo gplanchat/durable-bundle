@@ -882,9 +882,9 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
         if (!isset($this->journals[$executionId])) {
             // An indexed COUNT, then a read that stops at the panel's limit: the SQL stores walk a
             // cursor, and breaking out of it spares hydrating the rest of a long journal.
-            $count = $this->eventStore->countEventsInStream($executionId);
+            $count = $this->eventStore->countEventsInStream(ExecutionId::fromString($executionId));
             $entries = [];
-            foreach ($this->eventStore->readStreamWithRecordedAt($executionId) as $entry) {
+            foreach ($this->eventStore->readStreamWithRecordedAt(ExecutionId::fromString($executionId)) as $entry) {
                 if (\count($entries) >= self::MAX_STORE_EVENTS_PER_STREAM) {
                     break;
                 }
