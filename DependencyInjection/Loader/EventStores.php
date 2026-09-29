@@ -27,6 +27,7 @@ use Gplanchat\Bridge\Temporal\WorkflowServiceClientFactory;
 use Gplanchat\Bridge\Temporal\WorkflowServiceClientInterface;
 use Gplanchat\Durable\Bundle\Command\HealthCommand;
 use Gplanchat\Durable\Bundle\DependencyInjection\DurableExtension;
+use Gplanchat\Durable\Bundle\Observation\WorkerPresence;
 use Gplanchat\Durable\Nexus\Serving\NexusOperationRegistry;
 use Gplanchat\Durable\Observation\WorkflowRunPickupProjectionInterface;
 use Gplanchat\Durable\Port\ActivityHeartbeatSenderInterface;
@@ -262,7 +263,7 @@ final class EventStores
 
         // `durable:health` checks the roles that poll this cluster: workflow and activity only when
         // it holds the journal; NexusHandlerPass adds nexus once something serves it.
-        $container->register('durable.command.health', HealthCommand::class)
+        $container->register('durable.worker_presence', WorkerPresence::class)
             ->setArguments([
                 (new Definition(TemporalTaskQueueProbe::class))->setArguments([
                     new Reference('durable.temporal.workflow_service_client'),
@@ -270,6 +271,10 @@ final class EventStores
                 ]),
                 DurableExtension::isTemporalNative($config) ? ['workflow', 'activity'] : [],
             ])
+            ->setPublic(false)
+        ;
+        $container->register('durable.command.health', HealthCommand::class)
+            ->setArguments([new Reference('durable.worker_presence')])
             ->addTag('console.command', ['command' => 'durable:health'])
             ->setPublic(false)
         ;
