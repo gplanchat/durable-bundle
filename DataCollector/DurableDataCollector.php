@@ -27,6 +27,7 @@ use Gplanchat\Durable\Event\WorkflowExecutionCancelled;
 use Gplanchat\Durable\Event\WorkflowExecutionFailed;
 use Gplanchat\Durable\Event\WorkflowSignalReceived;
 use Gplanchat\Durable\Event\WorkflowUpdateHandled;
+use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Observation\JournalRunHistoryReader;
 use Gplanchat\Durable\Observation\KeyPatternPayloadRedactor;
 use Gplanchat\Durable\Observation\PayloadRedactorInterface;
@@ -210,7 +211,7 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
                 'payloadSummary' => $this->summarizePayload($payload),
                 'executionStatus' => $statusCode,
                 'executionStatusLabel' => $this->executionStatusLabel($statusCode),
-                'waitingOn' => $this->runCatalog?->findRun($eid)?->waitingOn,
+                'waitingOn' => $this->runCatalog?->findRun(ExecutionId::fromString($eid))?->waitingOn,
                 'storeEventCount' => max($storeCountFromIndex, $storeCountLive),
                 'storeTruncated' => $storeTl['truncated'] ?? false,
                 'processTraceCount' => \count($processTf['segments']),
