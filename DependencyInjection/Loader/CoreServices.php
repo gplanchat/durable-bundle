@@ -63,7 +63,7 @@ final class CoreServices
         $container->register('durable.activity_executor', RegistryActivityExecutor::class)
             ->setPublic(false)
         ;
-        $container->setAlias(\Gplanchat\Durable\ActivityExecutor::class, 'durable.activity_executor')->setPublic(true);
+        $container->setAlias(\Gplanchat\Durable\ActivityExecutor::class, 'durable.activity_executor');
     }
 
     /**
@@ -89,7 +89,7 @@ final class CoreServices
             ])
             ->setPublic(false)
         ;
-        $container->setAlias(\Gplanchat\Durable\ExecutionRuntime::class, 'durable.runtime')->setPublic(true);
+        $container->setAlias(\Gplanchat\Durable\ExecutionRuntime::class, 'durable.runtime');
     }
 
     public static function registerParentChildCoordinator(ContainerBuilder $container): void
@@ -101,7 +101,7 @@ final class CoreServices
             ])
             ->setPublic(false)
         ;
-        $container->setAlias(ParentChildWorkflowCoordinatorInterface::class, 'durable.parent_child_coordinator')->setPublic(true);
+        $container->setAlias(ParentChildWorkflowCoordinatorInterface::class, 'durable.parent_child_coordinator');
     }
 
     /**
@@ -146,7 +146,7 @@ final class CoreServices
             ])
             ->setPublic(false)
         ;
-        $container->setAlias(\Gplanchat\Durable\ExecutionEngine::class, 'durable.engine')->setPublic(true);
+        $container->setAlias(\Gplanchat\Durable\ExecutionEngine::class, 'durable.engine');
     }
 
     /**
@@ -177,7 +177,7 @@ final class CoreServices
             ->setArguments([new Reference(EventStoreInterface::class)])
             ->setPublic(false)
         ;
-        $container->setAlias(WorkflowQueryRunner::class, 'durable.query_runner')->setPublic(true);
+        $container->setAlias(WorkflowQueryRunner::class, 'durable.query_runner');
     }
 
     public static function registerWorkflowBackend(ContainerBuilder $container): void
@@ -187,7 +187,7 @@ final class CoreServices
             ->setArguments([new Reference(\Gplanchat\Durable\ExecutionEngine::class)])
             ->setPublic(false)
         ;
-        $container->setAlias(WorkflowBackendInterface::class, 'durable.workflow_backend')->setPublic(true);
+        $container->setAlias(WorkflowBackendInterface::class, 'durable.workflow_backend');
     }
 
     /**
@@ -286,7 +286,7 @@ final class CoreServices
             ])
             ->setPublic(false)
         ;
-        $container->setAlias(ActivityMessageProcessor::class, 'durable.activity_message_processor')->setPublic(true);
+        $container->setAlias(ActivityMessageProcessor::class, 'durable.activity_message_processor');
 
         $activityTransportConfig = $config['activity_transport'] ?? [];
         if ('messenger' === ($activityTransportConfig['type'] ?? '')
@@ -297,7 +297,7 @@ final class CoreServices
                 ->addTag('messenger.message_handler', ['from_transport' => $activityTransportName])
                 ->setPublic(false)
             ;
-            $container->setAlias(ActivityRunHandler::class, 'durable.handler.activity_run')->setPublic(true);
+            $container->setAlias(ActivityRunHandler::class, 'durable.handler.activity_run');
         }
     }
 }

@@ -112,9 +112,7 @@ final class DurableExtension extends Extension
             return;
         }
 
-        $container->setAlias(WorkflowExecutionObserverInterface::class, $service)
-            ->setPublic(true)
-        ;
+        $container->setAlias(WorkflowExecutionObserverInterface::class, $service);
     }
 
 }

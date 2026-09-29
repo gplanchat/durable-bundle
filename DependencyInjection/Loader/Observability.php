@@ -52,7 +52,6 @@ final class Observability
             // `services_resetter` empties the trace between two Messenger messages. A Temporal
             // worker never triggers it; the trace bounds itself for that case (MAX_ENTRIES).
             ->addTag('kernel.reset', ['method' => 'reset'])
-            ->setPublic(true)
         ;
 
         DurableExtension::aliasObserver($container, 'durable.execution_trace');

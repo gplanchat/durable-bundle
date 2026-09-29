@@ -163,7 +163,6 @@ final class DbalStores
         if ($parentLinkDbal) {
             $container->register('durable.child_workflow_parent_link_store', DbalChildWorkflowParentLinkStore::class)
                 ->setArguments([$connection, $schema, $config['child_workflow']['parent_link_store']['table_name']])
-                ->setPublic(true)
             ;
         }
 

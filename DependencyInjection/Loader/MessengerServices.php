@@ -53,7 +53,7 @@ final class MessengerServices
 
         if ($isTemporalNative) {
             $container->register('durable.activity_transport', NoopActivityTransport::class)->setPublic(false);
-            $container->setAlias(ActivityTransportInterface::class, 'durable.activity_transport')->setPublic(true);
+            $container->setAlias(ActivityTransportInterface::class, 'durable.activity_transport');
 
             return;
         }
@@ -67,13 +67,13 @@ final class MessengerServices
                 ])
                 ->setPublic(false)
             ;
-            $container->setAlias(ActivityTransportInterface::class, 'durable.activity_transport')->setPublic(true);
+            $container->setAlias(ActivityTransportInterface::class, 'durable.activity_transport');
 
             return;
         }
 
         $container->register('durable.activity_transport', InMemoryActivityTransport::class)->setArguments([CoreServices::clock()])->setPublic(false);
-        $container->setAlias(ActivityTransportInterface::class, 'durable.activity_transport')->setPublic(true);
+        $container->setAlias(ActivityTransportInterface::class, 'durable.activity_transport');
     }
 
     /**
@@ -104,7 +104,7 @@ final class MessengerServices
             ->setArguments([new Reference(WorkflowDefinitionLoader::class)])
             ->setPublic(false)
         ;
-        $container->setAlias(\Gplanchat\Durable\WorkflowRegistry::class, 'durable.workflow_registry')->setPublic(true);
+        $container->setAlias(\Gplanchat\Durable\WorkflowRegistry::class, 'durable.workflow_registry');
 
         $container->register('durable.child_workflow_runner', \Gplanchat\Durable\ChildWorkflowRunner::class)
             ->setArguments([
@@ -119,7 +119,7 @@ final class MessengerServices
             ])
             ->setPublic(false)
         ;
-        $container->setAlias(\Gplanchat\Durable\ChildWorkflowRunner::class, 'durable.child_workflow_runner')->setPublic(true);
+        $container->setAlias(\Gplanchat\Durable\ChildWorkflowRunner::class, 'durable.child_workflow_runner');
 
         if ($isTemporalNative) {
             $container->register('durable.resume_dispatcher', TemporalWorkflowResumeDispatcher::class)

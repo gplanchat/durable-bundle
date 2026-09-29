@@ -56,13 +56,8 @@ final class EventStores
 {
     public static function registerChildWorkflowParentLinkStore(ContainerBuilder $container): void
     {
-        $container->register('durable.child_workflow_parent_link_store', InMemoryChildWorkflowParentLinkStore::class)
-            ->setPublic(true)
-        ;
-
-        $container->setAlias(ChildWorkflowParentLinkStoreInterface::class, 'durable.child_workflow_parent_link_store')
-            ->setPublic(true)
-        ;
+        $container->register('durable.child_workflow_parent_link_store', InMemoryChildWorkflowParentLinkStore::class);
+        $container->setAlias(ChildWorkflowParentLinkStoreInterface::class, 'durable.child_workflow_parent_link_store');
     }
 
     /**
@@ -134,7 +129,7 @@ final class EventStores
         }
 
         $fromAssembly('durable.temporal.workflow_task_runner', WorkflowTaskRunner::class, 'workflowTaskRunner');
-        $container->setAlias(WorkflowTaskRunner::class, 'durable.temporal.workflow_task_runner')->setPublic(true);
+        $container->setAlias(WorkflowTaskRunner::class, 'durable.temporal.workflow_task_runner');
         // Private: the journal transport takes it by reference, nothing pulls it by id (#337).
         $fromAssembly(WorkflowTaskProcessor::class, WorkflowTaskProcessor::class, 'workflowTaskProcessor');
         $fromAssembly('durable.event_store.temporal', TemporalReadThroughEventStore::class, 'readThroughEventStore', false, [new Reference('durable.event_store.inner')]);
@@ -237,7 +232,6 @@ final class EventStores
                 new Reference(EventStoreInterface::class),
                 new Reference(ActivityHeartbeatSenderInterface::class),
             ])
-            ->setPublic(true)
         ;
 
         // The registry exists as soon as Temporal is configured, even with no handler declared: it
@@ -255,7 +249,6 @@ final class EventStores
                 new Reference('durable.temporal.connection'),
                 new Reference('durable.temporal.nexus_registry'),
             ])
-            ->setPublic(true)
         ;
 
         // The workers are consumed by alias (`messenger:consume durable_workflows`), with no
