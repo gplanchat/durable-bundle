@@ -25,19 +25,17 @@ final class MessengerWorkflowResumeDispatcher implements WorkflowResumeDispatche
         private readonly ?SendersLocatorInterface $senders = null,
     ) {}
 
-    public function dispatchResume(ExecutionId|string $executionId, array $pendingUpdates = []): void
+    public function dispatchResume(ExecutionId $executionId, array $pendingUpdates = []): void
     {
-        $executionId = (string) $executionId;
         $this->bus->dispatch(new Envelope(
-            new ResumeWorkflowMessage($executionId, $pendingUpdates),
+            new ResumeWorkflowMessage($executionId->toString(), $pendingUpdates),
             [new DispatchAfterCurrentBusStamp()],
         ));
     }
 
-    public function dispatchResumeAwaiting(ExecutionId|string $executionId, AwaitedFact $fact): void
+    public function dispatchResumeAwaiting(ExecutionId $executionId, AwaitedFact $fact): void
     {
-        $executionId = (string) $executionId;
-        $message = new ResumeWorkflowMessage($executionId, [], $fact);
+        $message = new ResumeWorkflowMessage($executionId->toString(), [], $fact);
         // No DispatchAfterCurrentBusStamp: held until the activity handler returns, it would leave
         // after the append, and the worker could die before it left.
         if ($this->routedAsynchronously($message)) {
@@ -48,15 +46,14 @@ final class MessengerWorkflowResumeDispatcher implements WorkflowResumeDispatche
     /**
      * @param array<string, mixed> $payload
      */
-    public function dispatchNewWorkflowRun(ExecutionId|string $executionId, string $workflowType, array $payload): void
+    public function dispatchNewWorkflowRun(ExecutionId $executionId, string $workflowType, array $payload): void
     {
-        $executionId = (string) $executionId;
         // A caller passing `::class` gets the alias: the name the journal, the dashboard and the
         // diagnose command all show (#258).
         $workflowType = (new WorkflowDefinitionLoader())->aliasForTemporalInterop($workflowType);
-        $this->metadataStore->save(ExecutionId::fromString($executionId), $workflowType, $payload);
+        $this->metadataStore->save($executionId, $workflowType, $payload);
         $this->bus->dispatch(new Envelope(
-            new ResumeWorkflowMessage($executionId),
+            new ResumeWorkflowMessage($executionId->toString()),
             [new DispatchAfterCurrentBusStamp(), new NewWorkflowRunStamp($workflowType)],
         ));
     }
