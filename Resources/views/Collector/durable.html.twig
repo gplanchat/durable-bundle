@@ -160,6 +160,11 @@
         .durable-status-badge--pending { background: #fef3c7; color: #92400e; }
         .durable-status-badge--queued { background: #fef9c3; color: #854d0e; }
         h4.durable-section-title { margin-top: 1.5em; margin-bottom: 0.35em; font-size: 14px; }
+        .durable-nexus-state { padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+        .durable-nexus-state--in_flight { background: #dbeafe; color: #1e40af; }
+        .durable-nexus-state--completed { background: #dcfce7; color: #166534; }
+        .durable-nexus-state--failed, .durable-nexus-state--timed_out { background: #fee2e2; color: #991b1b; }
+        .durable-nexus-state--cancelled { background: #f3f4f6; color: #374151; }
     </style>
 {% endblock %}
 
@@ -343,6 +348,26 @@
                                             <dd class="text-muted">{{ ex.payloadSummary|default('—') }}</dd>
                                         </div>
                                     </dl>
+
+                                    {# The waits served by someone else (#670): where, and whether they are settled. #}
+                                    {% if ex.nexusOperations|default([])|length > 0 %}
+                                        <h4>Nexus operations</h4>
+                                        <table>
+                                            <thead>
+                                                <tr><th>Endpoint</th><th>Service</th><th>Operation</th><th>State</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for op in ex.nexusOperations %}
+                                                    <tr>
+                                                        <td><code>{{ op.endpoint }}</code></td>
+                                                        <td>{{ op.service }}</td>
+                                                        <td>{{ op.operation }}</td>
+                                                        <td><span class="durable-nexus-state durable-nexus-state--{{ op.state }}">{{ op.stateLabel }}</span></td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% endif %}
 
                                     {% if ex.journalHint is defined and ex.journalHint %}
                                         <p class="help" style="background:#fffbeb;border:1px solid #fcd34d;padding:10px 12px;border-radius:6px;">
