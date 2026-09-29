@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gplanchat\Durable\Bundle\Handler;
 
+use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Port\WorkflowResumeDispatcher;
 use Gplanchat\Durable\Transport\DeliverWorkflowUpdateMessage;
 
@@ -26,7 +27,7 @@ final class DeliverWorkflowUpdateHandler
 
     public function __invoke(DeliverWorkflowUpdateMessage $message): void
     {
-        $this->resumeDispatcher->dispatchResume($message->executionId, [[
+        $this->resumeDispatcher->dispatchResume(ExecutionId::fromString($message->executionId), [[
             'name' => $message->updateName,
             'arguments' => $message->arguments,
         ]]);

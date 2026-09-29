@@ -71,7 +71,7 @@ trait DurableBundleTestTrait
         $loader = new WorkflowDefinitionLoader();
         $workflowType = $loader->workflowTypeForClass($workflowClass);
 
-        $this->getWorkflowResumeDispatcher()->dispatchNewWorkflowRun($executionId, $workflowType, $input);
+        $this->getWorkflowResumeDispatcher()->dispatchNewWorkflowRun(ExecutionId::fromString($executionId), $workflowType, $input);
 
         return $executionId;
     }

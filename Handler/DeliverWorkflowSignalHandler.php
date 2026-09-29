@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gplanchat\Durable\Bundle\Handler;
 
 use Gplanchat\Durable\Event\WorkflowSignalReceived;
+use Gplanchat\Durable\ExecutionId;
 use Gplanchat\Durable\Port\WorkflowResumeDispatcher;
 use Gplanchat\Durable\Store\EventStoreInterface;
 use Gplanchat\Durable\Transport\AwaitedFact;
@@ -26,9 +27,10 @@ final class DeliverWorkflowSignalHandler
 
     public function __invoke(DeliverWorkflowSignalMessage $message): void
     {
+        $id = ExecutionId::fromString($message->executionId);
         $signal = AwaitedFact::signal($message->requestId);
         if (!$signal->isJournalledIn($this->eventStore, $message->executionId)) {
-            $this->resumeDispatcher->dispatchResumeAwaiting($message->executionId, $signal);
+            $this->resumeDispatcher->dispatchResumeAwaiting($id, $signal);
             $this->eventStore->append(new WorkflowSignalReceived(
                 $message->executionId,
                 $message->signalName,
@@ -36,6 +38,6 @@ final class DeliverWorkflowSignalHandler
                 $message->requestId,
             ));
         }
-        $this->resumeDispatcher->dispatchResume($message->executionId);
+        $this->resumeDispatcher->dispatchResume($id);
     }
 }
