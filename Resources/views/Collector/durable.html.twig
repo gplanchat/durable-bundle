@@ -239,9 +239,9 @@
                     <table class="durable-summary-table">
                         <thead>
                             <tr>
-                                <th>Workflow ID</th>
+                                <th>Execution</th>
                                 <th>Type</th>
-                                <th>Status</th>
+                                <th>Outcome</th>
                                 <th>Input</th>
                                 <th>Process trace (segments)</th>
                                 <th>Events</th>
@@ -273,7 +273,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>executionId</th>
+                                <th>Execution</th>
                                 <th>Metadata</th>
                                 <th>Events (count)</th>
                             </tr>
@@ -316,7 +316,7 @@
                                 <div class="tab-content">
                                     <dl class="durable-exec-header">
                                         <div>
-                                            <dt>Workflow ID</dt>
+                                            <dt>Execution</dt>
                                             <dd><code>{{ ex.executionId }}</code></dd>
                                         </div>
                                         <div>
@@ -324,7 +324,7 @@
                                             <dd>{{ _wf|default('—') }}</dd>
                                         </div>
                                         <div>
-                                            <dt>Status</dt>
+                                            <dt>Outcome</dt>
                                             <dd>
                                                 <span class="durable-status-badge durable-status-badge--{{ ex.executionStatus|default('unknown') }}">{{ ex.executionStatusLabel|default('—') }}</span>
                                             </dd>
@@ -379,7 +379,7 @@
                                     {% endif %}
 
                                     {% if ex.storeRows|length > 0 %}
-                                        <h4 class="durable-section-title">Event history</h4>
+                                        <h4 class="durable-section-title">History</h4>
                                         <p class="help">The equivalent of Temporal's <em>Event history</em> tab: the journal in chronological order, the event type, the payload.</p>
                                         <table>
                                             <thead>
@@ -530,7 +530,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>executionId</th>
+                                <th>Execution</th>
                                 <th>Event</th>
                             </tr>
                         </thead>

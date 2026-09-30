@@ -333,12 +333,16 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
         };
     }
 
+    /**
+     * The words of the other dashboards for the five outcomes. `cancel_requested`, `queued` and
+     * `pending` are not outcomes: they say where a run is on this request, and keep their own.
+     */
     private function executionStatusLabel(string $code): string
     {
         return match ($code) {
-            'completed' => 'Finished',
+            'completed' => 'Completed',
             'failed' => 'Failed',
-            'continued_as_new' => 'Continue as new',
+            'continued_as_new' => 'Continued as new',
             'cancel_requested' => 'Cancellation requested',
             'cancelled' => 'Cancelled',
             'running' => 'Running',
