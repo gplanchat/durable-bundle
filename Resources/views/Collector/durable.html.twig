@@ -481,7 +481,7 @@
                                     {% set ptf = ex.processTimeframe|default({}) %}
                                     {% if ptf.bounds is not null and ptf.segments is not empty %}
                                         <h4 class="durable-section-title">Progress on this request (process timing)</h4>
-                                        <p class="help">What the timeline above does not show: the time this process spent on the run during this request. The Messenger dispatch, the engine turns (start or resume) and the activities run here are measured in the process, and the journal records none of them.</p>
+                                        <p class="help">This trace shows the time this process spent on the run during this request. The Messenger dispatch, the engine turns (start or resume) and the activities run here are measured in the process. The journal records none of them, so the timeline above does not show them.</p>
                                         <div class="durable-timeframe-wrap">
                                             <div class="durable-timeframe-legend">
                                                 <span><span class="durable-timeframe-swatch" style="background:#4a90d9"></span> Messenger (ResumeWorkflowMessage)</span>
