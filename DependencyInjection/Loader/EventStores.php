@@ -94,6 +94,13 @@ final class EventStores
             $client->setArgument(2, $client->getArguments()[2] ?? null);
             $client->setArgument(3, new Definition(Psr18Http::class, [new Reference($psr18), $psr17, $psr17]));
         }
+        // Every payload encoded on the way out, decoded on the way in (DUR055); the codec holds its key.
+        $codec = $temporalConfig['payload_codec'] ?? null;
+        if (\is_string($codec) && '' !== $codec) {
+            $client->setArgument(2, $client->getArguments()[2] ?? null);
+            $client->setArgument(3, $client->getArguments()[3] ?? null);
+            $client->setArgument(4, new Reference($codec));
+        }
 
         // The graph is the bridge's (#356): each service below is one of the assembly's
         // objects, under the id it always had.
