@@ -227,7 +227,7 @@ final class DurableProfilerEventPresentation
         if ($event instanceof ChildWorkflowScheduled) {
             return [
                 'title' => 'Child workflow scheduled',
-                'subtitle' => $event->childWorkflowType() . ' · enfant ' . $event->childExecutionId()->toString(),
+                'subtitle' => $event->childWorkflowType() . ' · enfant ' . $event->childExecutionId(),
                 'category' => 'child',
                 'technical' => $technical,
             ];
@@ -236,7 +236,7 @@ final class DurableProfilerEventPresentation
         if ($event instanceof ChildWorkflowCompleted) {
             return [
                 'title' => 'Child workflow finished',
-                'subtitle' => 'enfant ' . $event->childExecutionId()->toString(),
+                'subtitle' => 'enfant ' . $event->childExecutionId(),
                 'category' => 'child',
                 'technical' => $technical,
             ];
