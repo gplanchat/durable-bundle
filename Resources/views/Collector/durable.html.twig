@@ -404,7 +404,12 @@
                                                         <td>{{ row.phase|default('—') }}</td>
                                                         <td><strong>{{ row.title|default(row.label) }}</strong></td>
                                                         <td class="text-muted">{{ row.subtitle|default('') }}</td>
-                                                        <td><pre class="text-muted" style="max-height:100px;overflow:auto">{{ row.payload|json_encode(128) }}</pre></td>
+                                                        <td>
+                                                            {# Folded, as on the run pages (#820): a disclosure that opens on nothing gets opened again every time. #}
+                                                            {% if row.payload is not empty %}
+                                                                <details><summary>Payload</summary><pre class="text-muted" style="max-height:100px;overflow:auto">{{ row.payload|json_encode(128) }}</pre></details>
+                                                            {% else %}—{% endif %}
+                                                        </td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
@@ -476,7 +481,9 @@
                                                         <td>
                                                             {% if e.kind == 'dispatch' %}
                                                                 <strong>{{ e.dispatchSummary|default(e.workflowType|default('—')) }}</strong>
-                                                                <pre class="text-muted" style="max-height:80px;overflow:auto">{{ e.payload|default({})|json_encode(128) }}</pre>
+                                                                {% if e.payload|default({}) is not empty %}
+                                                                    <details><summary>Payload</summary><pre class="text-muted" style="max-height:80px;overflow:auto">{{ e.payload|json_encode(128) }}</pre></details>
+                                                                {% endif %}
                                                             {% elseif e.kind == 'workflow' %}
                                                                 {{ e.workflowType }}
                                                             {% elseif e.kind == 'activity' %}
