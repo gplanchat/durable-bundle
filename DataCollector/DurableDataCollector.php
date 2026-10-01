@@ -33,6 +33,10 @@ use Gplanchat\Durable\Observation\KeyPatternPayloadRedactor;
 use Gplanchat\Durable\Observation\NexusOperationSummary;
 use Gplanchat\Durable\Observation\PayloadRedactorInterface;
 use Gplanchat\Durable\Observation\RecordedDetails;
+use Gplanchat\Durable\Observation\RunTimeline;
+use Gplanchat\Durable\Observation\TimelineAction;
+use Gplanchat\Durable\Observation\TimelineEvent;
+use Gplanchat\Durable\Observation\TimelineSegment;
 use Gplanchat\Durable\Port\WorkflowRunCatalogInterface;
 use Gplanchat\Durable\Store\EventStoreInterface;
 use Gplanchat\Durable\Store\WorkflowMetadataStore;
@@ -221,6 +225,7 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
                 'storeRows' => $rows,
                 'timelineEntries' => $groupedTimeline[$eid] ?? [],
                 'journalHint' => $this->buildJournalHint($rows, $storeCountLive, $timelineHasDispatch),
+                'runTimeline' => $this->runTimeline($eid, $wf ?? ''),
                 // Where each Nexus operation is served, and whether it is still in flight (#670).
                 'nexusOperations' => array_map(static fn(NexusOperationSummary $operation): array => [
                     'endpoint' => $operation->endpoint,
@@ -233,6 +238,43 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
         }
 
         return $out;
+    }
+
+    /**
+     * The shared frieze of the run pages (#819), over the events this panel read. Only what the
+     * drawing needs is kept: a `TimelineEvent` carries the event's unmasked details, and `$this->data`
+     * is written to the profile.
+     *
+     * @return array{span: float, spanLabel: string, actions: list<array<string, mixed>>}
+     */
+    private function runTimeline(string $executionId, string $workflowType): array
+    {
+        $timeline = RunTimeline::of(
+            JournalRunHistoryReader::fromEntries($this->journal($executionId)['entries'], $workflowType),
+            $this->redactor,
+        );
+
+        return [
+            'span' => $timeline->span,
+            'spanLabel' => $timeline->spanLabel,
+            'actions' => array_map(static fn(TimelineAction $action): array => [
+                'kind' => $action->kind->value,
+                'label' => $action->label,
+                'durationLabel' => $action->durationLabel,
+                'segments' => array_map(static fn(TimelineSegment $segment): array => [
+                    'offset' => $segment->offset,
+                    'duration' => $segment->duration,
+                    'waiting' => $segment->waiting,
+                    'failed' => $segment->failed,
+                    'title' => $segment->title,
+                ], $action->segments),
+                'marks' => array_map(static fn(TimelineEvent $mark): array => [
+                    'offset' => $mark->offset,
+                    'failed' => $mark->event->failed,
+                    'title' => $mark->title,
+                ], $action->events),
+            ], $timeline->actions),
+        ];
     }
 
     /**
