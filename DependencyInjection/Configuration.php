@@ -175,7 +175,7 @@ final readonly class Configuration implements ConfigurationInterface
 
         if (null === $backend) {
             if (null !== $dsn && false !== $journal && 'dbal' === $eventStore) {
-                throw new \InvalidArgumentException('event_store.type "dbal" and temporal.dsn are mutually exclusive — the journal cannot have two sources of truth. Set backend: dbal to keep the journal in SQL and use the cluster to serve Nexus (with the deprecated keys: temporal.journal: false).');
+                throw new \InvalidArgumentException('event_store.type "dbal" and temporal.dsn are mutually exclusive: the journal cannot have two sources of truth. Set backend: dbal to keep the journal in SQL and use the cluster to serve Nexus (with the deprecated keys: temporal.journal: false).');
             }
             $backend = match (true) {
                 null !== $dsn && false !== $journal => 'temporal',
