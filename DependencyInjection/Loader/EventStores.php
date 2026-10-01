@@ -112,6 +112,7 @@ final class EventStores
                 new Reference('durable.temporal.connection'),
                 new Reference(\Gplanchat\Durable\WorkflowRegistry::class),
                 new Reference(WorkflowDefinitionLoader::class),
+                new Reference('logger', ContainerInterface::NULL_ON_INVALID_REFERENCE),
             ])
             ->setPublic(false)
         ;
