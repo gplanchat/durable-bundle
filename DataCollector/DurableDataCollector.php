@@ -264,12 +264,14 @@ final class DurableDataCollector extends DataCollector implements ResetInterface
             }
         }
 
-        if (null !== $metadata && ($metadata['completed'] ?? false) === false && $this->metadataStore->hasActiveWorkflowMetadata(ExecutionId::fromString($executionId))) {
-            return 'running';
-        }
-
+        // Before the metadata branch: the metadata exists from the dispatch, so a run dispatched
+        // on this request and not executed yet has it too (#851).
         if ($timelineHasDispatch && 0 === $n) {
             return 'queued';
+        }
+
+        if (null !== $metadata && ($metadata['completed'] ?? false) === false && $this->metadataStore->hasActiveWorkflowMetadata(ExecutionId::fromString($executionId))) {
+            return 'running';
         }
 
         return 'pending';
