@@ -25,15 +25,13 @@ final readonly class DeliverWorkflowUpdateHandler
 {
     public function __construct(
         private readonly WorkflowResumeDispatcher $resumeDispatcher,
-        private readonly ?EventStoreInterface $eventStore = null,
+        private readonly EventStoreInterface $eventStore,
     ) {}
 
     public function __invoke(DeliverWorkflowUpdateMessage $message): void
     {
         $id = ExecutionId::fromString($message->executionId);
-        if (null !== $this->eventStore) {
-            WorkflowTaskJournal::schedule($this->eventStore, $this->resumeDispatcher, $id);
-        }
+        WorkflowTaskJournal::schedule($this->eventStore, $this->resumeDispatcher, $id);
         $this->resumeDispatcher->dispatchResume($id, [[
             'name' => $message->updateName,
             'arguments' => $message->arguments,
